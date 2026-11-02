@@ -1,9 +1,9 @@
 import type { ReactElement } from 'react';
 
-import { requireUser } from '@/lib/auth';
+import { requireOnboardedUser } from '@/lib/auth';
 
 export default async function DashboardPage(): Promise<ReactElement> {
-  await requireUser();
+  await requireOnboardedUser();
 
   return (
     <section className="flex flex-col gap-3 py-10">

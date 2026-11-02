@@ -24,13 +24,16 @@ describe('profileSchema', () => {
   });
 
   it.each([
-    ['blank name', { displayName: '   ' }],
-    ['long name', { displayName: 'x'.repeat(DISPLAY_NAME_MAX_LENGTH + 1) }],
-    ['unknown handedness', { handedness: 'both' }],
-    ['unknown grip', { grip: 'seemiller' }],
-    ['unknown style', { playStyle: 'wizard' }],
-    ['long equipment name', { blade: 'x'.repeat(EQUIPMENT_NAME_MAX_LENGTH + 1) }],
-  ])('rejects %s', (_label, override) => {
-    expect(profileSchema.safeParse({ ...validInput, ...override }).success).toBe(false);
+    ['blank name', { displayName: '   ' }, 'Enter your name'],
+    ['long name', { displayName: 'x'.repeat(DISPLAY_NAME_MAX_LENGTH + 1) }, 'characters or fewer'],
+    ['unknown handedness', { handedness: 'both' }, 'Choose one'],
+    ['unknown grip', { grip: 'seemiller' }, 'Choose one'],
+    ['unknown style', { playStyle: 'wizard' }, 'Choose one'],
+    ['long equipment name', { blade: 'x'.repeat(EQUIPMENT_NAME_MAX_LENGTH + 1) }, 'characters or fewer'],
+  ])('rejects %s with a readable message', (_label, override, message) => {
+    const result = profileSchema.safeParse({ ...validInput, ...override });
+
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0]?.message).toContain(message);
   });
 });
