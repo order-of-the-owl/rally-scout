@@ -2,10 +2,10 @@
 
 import { useActionState, type ReactElement } from 'react';
 
-import { ChoiceGroup } from '@/components/profile/ChoiceGroup';
-import { gripLabels, handednessLabels, playStyleLabels } from '@/components/profile/profile-options';
+import { ChoiceGroup } from '@/components/forms/ChoiceGroup';
+import { gripLabels, handednessLabels, playStyleLabels } from '@/components/forms/option-labels';
+import { TextField } from '@/components/forms/TextField';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import type { ProfileFormState, SubmittedProfileValues } from '@/lib/validation/profile';
 
 const INITIAL_STATE: ProfileFormState = { status: 'idle' };
@@ -29,25 +29,13 @@ export function ProfileForm({ action, initialValues = {}, submitLabel }: Profile
 
   return (
     <form action={formAction} noValidate className="flex flex-col gap-8">
-      <div className="flex flex-col gap-2.5">
-        <label htmlFor="displayName" className="font-semibold">
-          Your name
-        </label>
-        <Input
-          id="displayName"
-          name="displayName"
-          autoComplete="name"
-          defaultValue={values.displayName ?? ''}
-          aria-invalid={fieldErrors.displayName ? true : undefined}
-          aria-describedby={fieldErrors.displayName ? 'displayName-error' : undefined}
-        />
-        {fieldErrors.displayName ? (
-          <p id="displayName-error" className="text-sm font-medium text-primary">
-            {fieldErrors.displayName[0]}
-          </p>
-        ) : null}
-      </div>
-
+      <TextField
+        name="displayName"
+        label="Your name"
+        autoComplete="name"
+        defaultValue={values.displayName}
+        errors={fieldErrors.displayName}
+      />
       <ChoiceGroup
         legend="Playing hand"
         name="handedness"
@@ -77,24 +65,15 @@ export function ProfileForm({ action, initialValues = {}, submitLabel }: Profile
           Equipment <span className="font-normal text-muted-foreground">(optional)</span>
         </legend>
         {equipmentFields.map(({ name, label, placeholder }) => (
-          <div key={name} className="flex flex-col gap-1.5">
-            <label htmlFor={name} className="text-sm font-medium text-foreground-soft">
-              {label}
-            </label>
-            <Input
-              id={name}
-              name={name}
-              placeholder={placeholder}
-              defaultValue={values[name] ?? ''}
-              aria-invalid={fieldErrors[name] ? true : undefined}
-              aria-describedby={fieldErrors[name] ? `${name}-error` : undefined}
-            />
-            {fieldErrors[name] ? (
-              <p id={`${name}-error`} className="text-sm font-medium text-primary">
-                {fieldErrors[name][0]}
-              </p>
-            ) : null}
-          </div>
+          <TextField
+            key={name}
+            name={name}
+            label={label}
+            placeholder={placeholder}
+            defaultValue={values[name]}
+            errors={fieldErrors[name]}
+            isLabelSubtle
+          />
         ))}
       </fieldset>
 

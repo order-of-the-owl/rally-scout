@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 import { DISPLAY_NAME_MAX_LENGTH, EQUIPMENT_NAME_MAX_LENGTH } from '@/lib/config/app';
 import { Grip, Handedness, PlayStyle } from '@/lib/domain/enums';
+import type { FormState, SubmittedValues } from '@/lib/validation/form-state';
 
 const CHOOSE_ONE = 'Choose one';
 
@@ -27,11 +28,6 @@ export const profileSchema = z.object({
 
 export type Profile = z.infer<typeof profileSchema>;
 
-type ProfileField = keyof Profile;
-export type SubmittedProfileValues = Partial<Record<ProfileField, string>>;
-
-export type ProfileFormState =
-  | { status: 'idle' }
-  | { status: 'invalid'; fieldErrors: Partial<Record<ProfileField, string[]>>; values: SubmittedProfileValues }
-  | { status: 'failed'; values: SubmittedProfileValues }
-  | { status: 'saved'; values: SubmittedProfileValues };
+export type ProfileField = keyof Profile;
+export type SubmittedProfileValues = SubmittedValues<ProfileField>;
+export type ProfileFormState = FormState<ProfileField>;

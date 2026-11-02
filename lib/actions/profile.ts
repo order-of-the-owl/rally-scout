@@ -8,22 +8,12 @@ import { requireUser } from '@/lib/auth';
 import { Route } from '@/lib/config/routes';
 import { saveProfile } from '@/lib/db/queries/users';
 import { logger } from '@/lib/logger';
-import { profileSchema, type ProfileFormState, type SubmittedProfileValues } from '@/lib/validation/profile';
-
-function readSubmittedValues(formData: FormData): SubmittedProfileValues {
-  const values: SubmittedProfileValues = {};
-  for (const field of profileSchema.keyof().options) {
-    const value = formData.get(field);
-    if (typeof value === 'string') {
-      values[field] = value;
-    }
-  }
-  return values;
-}
+import { readSubmittedValues } from '@/lib/validation/form-state';
+import { profileSchema, type ProfileFormState } from '@/lib/validation/profile';
 
 async function submitProfile(formData: FormData): Promise<ProfileFormState> {
   const userId = await requireUser();
-  const values = readSubmittedValues(formData);
+  const values = readSubmittedValues(formData, profileSchema.keyof().options);
 
   const parsed = profileSchema.safeParse(values);
   if (!parsed.success) {
