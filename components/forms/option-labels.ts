@@ -1,4 +1,4 @@
-import { Grip, Handedness, PlayStyle, RubberType } from '@/lib/domain/enums';
+import { EventType, Grip, Handedness, PlayStyle, PointEnding, RubberType } from '@/lib/domain/enums';
 
 export const handednessLabels = {
   [Handedness.Right]: 'Right',
@@ -25,3 +25,24 @@ export const rubberTypeLabels = {
   [RubberType.LongPips]: 'Long pips',
   [RubberType.Anti]: 'Anti-spin',
 } as const satisfies Record<RubberType, string>;
+
+export const eventTypeLabels = {
+  [EventType.Casual]: 'Casual',
+  [EventType.League]: 'League',
+  [EventType.Tournament]: 'Tournament',
+} as const satisfies Record<EventType, string>;
+
+export const pointEndingLabels = {
+  [PointEnding.ServeAce]: 'Ace',
+  [PointEnding.ServeError]: 'Serve error',
+  [PointEnding.ReceiveError]: 'Receive error',
+  [PointEnding.ThirdBallWinner]: '3rd ball winner',
+  [PointEnding.ThirdBallError]: '3rd ball error',
+  [PointEnding.ForehandWinner]: 'FH winner',
+  [PointEnding.BackhandWinner]: 'BH winner',
+  [PointEnding.ForehandUnforcedError]: 'FH error',
+  [PointEnding.BackhandUnforcedError]: 'BH error',
+  [PointEnding.ForcedError]: 'Forced error',
+  [PointEnding.NetOrEdge]: 'Net / edge',
+  [PointEnding.Other]: 'Other',
+} as const satisfies Record<PointEnding, string>;

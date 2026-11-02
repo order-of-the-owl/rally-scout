@@ -6,7 +6,7 @@ import type { ReactElement } from 'react';
 import { gripLabels, handednessLabels, playStyleLabels, rubberTypeLabels } from '@/components/forms/option-labels';
 import { Button } from '@/components/ui/button';
 import { requireOnboardedUser } from '@/lib/auth';
-import { editOpponentRoute } from '@/lib/config/routes';
+import { editOpponentRoute, newMatchAgainstRoute } from '@/lib/config/routes';
 import { getOpponent } from '@/lib/db/queries/opponents';
 import { opponentIdSchema } from '@/lib/domain/ids';
 
@@ -58,6 +58,10 @@ export default async function OpponentPage({ params }: OpponentPageProps): Promi
           </Link>
         </Button>
       </div>
+
+      <Button asChild size="large" className="w-full sm:w-auto sm:self-start">
+        <Link href={newMatchAgainstRoute(opponent.id)}>Start a match</Link>
+      </Button>
 
       <dl className="grid gap-x-8 border-t border-border sm:grid-cols-2">
         {details.map(({ label, value }) => (
