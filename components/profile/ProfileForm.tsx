@@ -6,10 +6,15 @@ import { ChoiceGroup } from '@/components/profile/ChoiceGroup';
 import { gripLabels, handednessLabels, playStyleLabels } from '@/components/profile/profile-options';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { saveProfileAction } from '@/lib/actions/profile';
-import type { ProfileFormState } from '@/lib/validation/profile';
+import type { ProfileFormState, SubmittedProfileValues } from '@/lib/validation/profile';
 
 const INITIAL_STATE: ProfileFormState = { status: 'idle' };
+
+interface ProfileFormProps {
+  action: (previousState: ProfileFormState, formData: FormData) => Promise<ProfileFormState>;
+  initialValues?: SubmittedProfileValues;
+  submitLabel: string;
+}
 
 const equipmentFields = [
   { name: 'blade', label: 'Blade', placeholder: 'e.g. Butterfly Viscaria' },
@@ -17,9 +22,9 @@ const equipmentFields = [
   { name: 'backhandRubber', label: 'Backhand rubber', placeholder: 'e.g. Rakza 7' },
 ] as const;
 
-export function ProfileForm(): ReactElement {
-  const [state, formAction, isPending] = useActionState(saveProfileAction, INITIAL_STATE);
-  const values = state.status === 'idle' ? {} : state.values;
+export function ProfileForm({ action, initialValues = {}, submitLabel }: ProfileFormProps): ReactElement {
+  const [state, formAction, isPending] = useActionState(action, INITIAL_STATE);
+  const values = state.status === 'idle' ? initialValues : state.values;
   const fieldErrors = state.status === 'invalid' ? state.fieldErrors : {};
 
   return (
@@ -99,8 +104,13 @@ export function ProfileForm(): ReactElement {
             Your profile couldn&apos;t be saved. Please try again.
           </p>
         ) : null}
+        {state.status === 'saved' ? (
+          <p role="status" className="font-medium text-foreground-soft">
+            Profile saved.
+          </p>
+        ) : null}
         <Button type="submit" size="large" disabled={isPending} className="w-full sm:w-auto sm:self-start">
-          {isPending ? 'Saving…' : 'Save and continue'}
+          {isPending ? 'Saving…' : submitLabel}
         </Button>
       </div>
     </form>

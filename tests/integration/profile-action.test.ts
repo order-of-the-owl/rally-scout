@@ -5,7 +5,7 @@ import { eq, inArray } from 'drizzle-orm';
 import { redirect } from 'next/navigation';
 import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { saveProfileAction } from '@/lib/actions/profile';
+import { completeOnboardingAction, updateProfileAction } from '@/lib/actions/profile';
 import { requireOnboardedUser } from '@/lib/auth';
 import { Route } from '@/lib/config/routes';
 import { getDb } from '@/lib/db';
@@ -16,6 +16,7 @@ import { userIdSchema, type UserId } from '@/lib/domain/ids';
 import type { ProfileFormState } from '@/lib/validation/profile';
 
 vi.mock('@clerk/nextjs/server', () => ({ auth: vi.fn() }));
+vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }));
 vi.mock('next/navigation', () => ({
   redirect: vi.fn((url: string) => {
     throw new Error(`redirect:${url}`);
@@ -59,11 +60,11 @@ afterAll(async () => {
   await getDb().delete(users).where(inArray(users.id, createdUserIds));
 });
 
-describe('saveProfileAction', () => {
+describe('completeOnboardingAction', () => {
   it('saves a valid profile and redirects to the dashboard', async () => {
     const userId = signInAsNewUser();
 
-    await expect(saveProfileAction(IDLE, buildForm())).rejects.toThrow(`redirect:${Route.Dashboard}`);
+    await expect(completeOnboardingAction(IDLE, buildForm())).rejects.toThrow(`redirect:${Route.Dashboard}`);
 
     const [user] = await getDb().select().from(users).where(eq(users.id, userId));
     expect(user?.displayName).toBe('Sam');
@@ -73,7 +74,7 @@ describe('saveProfileAction', () => {
   it('returns field errors and the submitted values without saving', async () => {
     const userId = signInAsNewUser();
 
-    const state = await saveProfileAction(IDLE, buildForm({ displayName: '  ', grip: 'seemiller' }));
+    const state = await completeOnboardingAction(IDLE, buildForm({ displayName: '  ', grip: 'seemiller' }));
 
     expect(state).toMatchObject({
       status: 'invalid',
@@ -88,7 +89,7 @@ describe('saveProfileAction', () => {
     const formData = buildForm();
     formData.delete('playStyle');
 
-    const state = await saveProfileAction(IDLE, formData);
+    const state = await completeOnboardingAction(IDLE, formData);
 
     expect(state).toMatchObject({ status: 'invalid', fieldErrors: { playStyle: ['Choose one'] } });
   });
@@ -98,10 +99,35 @@ describe('saveProfileAction', () => {
     const victimId = userIdSchema.parse(`test_${randomUUID()}`);
     createdUserIds.push(victimId);
 
-    await expect(saveProfileAction(IDLE, buildForm({ id: victimId }))).rejects.toThrow('redirect:');
+    await expect(completeOnboardingAction(IDLE, buildForm({ id: victimId }))).rejects.toThrow('redirect:');
 
     expect(await getDb().select().from(users).where(eq(users.id, victimId))).toEqual([]);
     expect(await getDb().select().from(users).where(eq(users.id, userId))).toHaveLength(1);
+  });
+});
+
+describe('updateProfileAction', () => {
+  it('saves changes and stays on the page', async () => {
+    const userId = signInAsNewUser();
+    await expect(completeOnboardingAction(IDLE, buildForm())).rejects.toThrow('redirect:');
+
+    const state = await updateProfileAction(IDLE, buildForm({ displayName: 'Sam L', blade: 'Viscaria' }));
+
+    expect(state).toMatchObject({ status: 'saved', values: { displayName: 'Sam L' } });
+    expect(redirect).toHaveBeenCalledTimes(1);
+    const [user] = await getDb().select().from(users).where(eq(users.id, userId));
+    expect(user).toMatchObject({ displayName: 'Sam L', blade: 'Viscaria' });
+  });
+
+  it('returns errors without changing the saved profile', async () => {
+    const userId = signInAsNewUser();
+    await expect(completeOnboardingAction(IDLE, buildForm())).rejects.toThrow('redirect:');
+
+    const state = await updateProfileAction(IDLE, buildForm({ displayName: ' ' }));
+
+    expect(state.status).toBe('invalid');
+    const [user] = await getDb().select().from(users).where(eq(users.id, userId));
+    expect(user?.displayName).toBe('Sam');
   });
 });
 
@@ -114,7 +140,7 @@ describe('requireOnboardedUser', () => {
 
   it('lets an onboarded user through', async () => {
     const userId = signInAsNewUser();
-    await expect(saveProfileAction(IDLE, buildForm())).rejects.toThrow('redirect:');
+    await expect(completeOnboardingAction(IDLE, buildForm())).rejects.toThrow('redirect:');
 
     expect(await requireOnboardedUser()).toEqual(await getOrCreateUser(userId));
   });

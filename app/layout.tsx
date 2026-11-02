@@ -25,6 +25,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: '#0a100e',
+  viewportFit: 'cover',
 };
 
 const clerkAppearance = {

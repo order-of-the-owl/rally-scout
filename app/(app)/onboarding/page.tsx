@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import type { ReactElement } from 'react';
 
 import { ProfileForm } from '@/components/profile/ProfileForm';
+import { completeOnboardingAction } from '@/lib/actions/profile';
 import { getCurrentUser } from '@/lib/auth';
 import { Route } from '@/lib/config/routes';
 
@@ -19,7 +20,7 @@ export default async function OnboardingPage(): Promise<ReactElement> {
           Your game plans use your style and equipment, so they fit how you actually play.
         </p>
       </div>
-      <ProfileForm />
+      <ProfileForm action={completeOnboardingAction} submitLabel="Save and continue" />
     </section>
   );
 }

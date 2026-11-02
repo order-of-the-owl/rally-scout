@@ -28,9 +28,10 @@ export const profileSchema = z.object({
 export type Profile = z.infer<typeof profileSchema>;
 
 type ProfileField = keyof Profile;
-type SubmittedValues = Partial<Record<ProfileField, string>>;
+export type SubmittedProfileValues = Partial<Record<ProfileField, string>>;
 
 export type ProfileFormState =
   | { status: 'idle' }
-  | { status: 'invalid'; fieldErrors: Partial<Record<ProfileField, string[]>>; values: SubmittedValues }
-  | { status: 'failed'; values: SubmittedValues };
+  | { status: 'invalid'; fieldErrors: Partial<Record<ProfileField, string[]>>; values: SubmittedProfileValues }
+  | { status: 'failed'; values: SubmittedProfileValues }
+  | { status: 'saved'; values: SubmittedProfileValues };
