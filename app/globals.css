@@ -1,0 +1,135 @@
+@import 'tailwindcss';
+
+:root {
+  color-scheme: dark;
+
+  --background: #0a100e;
+  --foreground: #eef3ef;
+  --foreground-soft: #c6d1cb;
+  --muted-foreground: #a9b7af;
+  --card: #121a17;
+  --card-raised: #1a2521;
+  --border: #26332e;
+  --primary: #ff7a1f;
+  --primary-foreground: #0a100e;
+  --radius: 0.375rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-foreground-soft: var(--foreground-soft);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-card: var(--card);
+  --color-card-raised: var(--card-raised);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --radius-md: var(--radius);
+
+  --font-display: var(--font-big-shoulders), 'Arial Narrow', sans-serif;
+  --font-sans: var(--font-instrument-sans), system-ui, sans-serif;
+
+  --animate-rise: rise 800ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-score-roll: score-roll 6s cubic-bezier(0.7, 0, 0.2, 1) infinite;
+  --animate-badge-reveal: badge-reveal 6s linear infinite;
+  --animate-serve-pulse: serve-pulse 1.6s ease-in-out infinite;
+  --animate-ball-travel: ball-travel 2.4s linear infinite alternate;
+  --animate-ball-bounce: ball-bounce 600ms cubic-bezier(0.35, 0, 0.65, 1) infinite alternate;
+  --animate-ball-shadow: ball-shadow 600ms cubic-bezier(0.35, 0, 0.65, 1) infinite alternate;
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(22px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes score-roll {
+    0%,
+    42% {
+      transform: translateY(0);
+    }
+    48%,
+    92% {
+      transform: translateY(-50%);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes badge-reveal {
+    0%,
+    44% {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    50%,
+    92% {
+      opacity: 1;
+      transform: none;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes serve-pulse {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.25);
+    }
+  }
+
+  @keyframes ball-travel {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(calc(100cqw - 100%));
+    }
+  }
+
+  @keyframes ball-bounce {
+    from {
+      transform: translateY(-46px);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes ball-shadow {
+    from {
+      opacity: 0.15;
+      transform: scaleX(0.5);
+    }
+    to {
+      opacity: 0.6;
+      transform: scaleX(1);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
