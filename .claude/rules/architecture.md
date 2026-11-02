@@ -20,7 +20,7 @@
 ## AI
 
 - All AI calls are server-side and go through `callStructured` in `lib/ai/client.ts`.
-- The app only knows LiteLLM aliases, never provider or model names.
+- Provider URLs and model names come from `lib/config/env.ts`, never from feature code.
 - AI receives numbers computed by code and never invents numbers or video links.
 
 ## UI

@@ -6,8 +6,7 @@ const validEnv = {
   DATABASE_URL: 'postgresql://user:fake-db-password@localhost:5432/rally_scout',
   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: 'pk_test_fake',
   CLERK_SECRET_KEY: 'sk_test_fake-clerk-secret',
-  LITELLM_BASE_URL: 'http://localhost:4000',
-  LITELLM_API_KEY: 'fake-litellm-key',
+  AI_API_KEY: 'fake-ai-key',
 };
 
 function captureEnvError(source: Readonly<Record<string, string | undefined>>): EnvValidationError {
@@ -26,15 +25,23 @@ describe('parseEnv', () => {
   it('accepts a valid environment and applies defaults', () => {
     const env = parseEnv(validEnv);
 
-    expect(env.AI_MODEL_REPORT).toBe('smart');
-    expect(env.AI_MODEL_FAST).toBe('fast');
+    expect(env.AI_BASE_URL).toBe('https://generativelanguage.googleapis.com/v1beta/openai/');
+    expect(env.AI_MODEL_REPORT).toBe('gemini-3.6-flash');
+    expect(env.AI_MODEL_FAST).toBe('gemini-3.5-flash-lite');
     expect(env.AI_RATE_LIMIT_PER_HOUR).toBe(20);
     expect(env.YOUTUBE_API_KEY).toBeUndefined();
   });
 
   it('accepts overrides and coerces numbers', () => {
-    const env = parseEnv({ ...validEnv, AI_MODEL_FAST: 'cheap', AI_RATE_LIMIT_PER_HOUR: '5', YOUTUBE_API_KEY: 'yt' });
+    const env = parseEnv({
+      ...validEnv,
+      AI_BASE_URL: 'http://localhost:4000',
+      AI_MODEL_FAST: 'cheap',
+      AI_RATE_LIMIT_PER_HOUR: '5',
+      YOUTUBE_API_KEY: 'yt',
+    });
 
+    expect(env.AI_BASE_URL).toBe('http://localhost:4000');
     expect(env.AI_MODEL_FAST).toBe('cheap');
     expect(env.AI_RATE_LIMIT_PER_HOUR).toBe(5);
     expect(env.YOUTUBE_API_KEY).toBe('yt');
@@ -47,14 +54,13 @@ describe('parseEnv', () => {
       'DATABASE_URL',
       'NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY',
       'CLERK_SECRET_KEY',
-      'LITELLM_BASE_URL',
-      'LITELLM_API_KEY',
+      'AI_API_KEY',
     ]);
   });
 
   it('treats empty strings as unset', () => {
-    expect(captureEnvError({ ...validEnv, LITELLM_API_KEY: '' }).invalidVariables).toEqual(['LITELLM_API_KEY']);
-    expect(parseEnv({ ...validEnv, YOUTUBE_API_KEY: '', AI_MODEL_FAST: '' }).AI_MODEL_FAST).toBe('fast');
+    expect(captureEnvError({ ...validEnv, AI_API_KEY: '' }).invalidVariables).toEqual(['AI_API_KEY']);
+    expect(parseEnv({ ...validEnv, YOUTUBE_API_KEY: '', AI_MODEL_FAST: '' }).AI_MODEL_FAST).toBe('gemini-3.5-flash-lite');
   });
 
   it.each([
@@ -62,7 +68,7 @@ describe('parseEnv', () => {
     ['DATABASE_URL', 'not a url'],
     ['NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY', 'sk_test_wrong-kind'],
     ['CLERK_SECRET_KEY', 'pk_test_wrong-kind'],
-    ['LITELLM_BASE_URL', 'ftp://localhost:4000'],
+    ['AI_BASE_URL', 'ftp://localhost:4000'],
     ['AI_RATE_LIMIT_PER_HOUR', '0'],
     ['AI_RATE_LIMIT_PER_HOUR', 'many'],
   ])('rejects %s=%s', (name, value) => {

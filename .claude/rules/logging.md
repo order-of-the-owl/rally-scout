@@ -14,8 +14,8 @@ logger.info('match.completed', { matchId, durationMs });
 ## What to log
 
 - Every Server Action and API route failure, with the error and the operation name.
-- Every AI call: model alias, latency, token usage, retry count, validation failures.
-- External API calls: YouTube cache hit or miss, quota errors, LiteLLM errors.
+- Every AI call: model, latency, token usage, retry count, validation failures.
+- External API calls: YouTube cache hit or miss, quota errors, AI provider errors.
 - Key state changes: match started, completed or abandoned; rate limit reached.
 
 ## What never to log

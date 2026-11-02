@@ -8,8 +8,11 @@ export const LogLevel = {
 } as const;
 export type LogLevel = (typeof LogLevel)[keyof typeof LogLevel];
 
-const DEFAULT_REPORT_MODEL = 'smart';
-const DEFAULT_FAST_MODEL = 'fast';
+// Calls Gemini directly because a hosted LiteLLM proxy doesn't fit free plans. To add fallbacks and spend
+// tracking later, point AI_BASE_URL at a proxy; the removed setup is in commit fbcdc4e.
+const DEFAULT_AI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/openai/';
+const DEFAULT_REPORT_MODEL = 'gemini-3.6-flash';
+const DEFAULT_FAST_MODEL = 'gemini-3.5-flash-lite';
 const DEFAULT_AI_RATE_LIMIT_PER_HOUR = 20;
 const PRODUCTION = 'production';
 
@@ -21,8 +24,8 @@ const envSchema = z.object({
   DATABASE_URL: databaseUrlSchema,
   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().startsWith('pk_'),
   CLERK_SECRET_KEY: z.string().startsWith('sk_'),
-  LITELLM_BASE_URL: z.url({ protocol: /^https?$/ }),
-  LITELLM_API_KEY: z.string().min(1),
+  AI_BASE_URL: z.url({ protocol: /^https?$/ }).default(DEFAULT_AI_BASE_URL),
+  AI_API_KEY: z.string().min(1),
   AI_MODEL_REPORT: z.string().min(1).default(DEFAULT_REPORT_MODEL),
   AI_MODEL_FAST: z.string().min(1).default(DEFAULT_FAST_MODEL),
   YOUTUBE_API_KEY: z.string().min(1).optional(),
