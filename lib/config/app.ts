@@ -1,0 +1,2 @@
+export const DISPLAY_NAME_MAX_LENGTH = 80;
+export const EQUIPMENT_NAME_MAX_LENGTH = 100;
