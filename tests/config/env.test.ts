@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { EnvValidationError, LogLevel, parseEnv, resolveLogLevel } from '@/lib/config/env';
+import { EnvValidationError, LogLevel, parseEnv, resolveDatabaseUrl, resolveLogLevel } from '@/lib/config/env';
 
 const validEnv = {
   DATABASE_URL: 'postgresql://user:fake-db-password@localhost:5432/rally_scout',
@@ -76,6 +76,17 @@ describe('parseEnv', () => {
     expect(error.message).not.toContain(secretValue);
     expect(JSON.stringify(error)).not.toContain(secretValue);
     expect(error.message).toContain('CLERK_SECRET_KEY');
+  });
+});
+
+describe('resolveDatabaseUrl', () => {
+  it('needs only DATABASE_URL', () => {
+    expect(resolveDatabaseUrl({ DATABASE_URL: validEnv.DATABASE_URL })).toBe(validEnv.DATABASE_URL);
+  });
+
+  it.each([[undefined], [''], ['mysql://localhost/rally_scout']])('rejects %s without exposing it', (value) => {
+    expect(() => resolveDatabaseUrl({ DATABASE_URL: value })).toThrow(EnvValidationError);
+    expect(() => resolveDatabaseUrl({ DATABASE_URL: value })).toThrow(/^Invalid environment variables: DATABASE_URL$/);
   });
 });
 

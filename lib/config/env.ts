@@ -15,8 +15,10 @@ const PRODUCTION = 'production';
 
 type EnvSource = Readonly<Record<string, string | undefined>>;
 
+const databaseUrlSchema = z.url({ protocol: /^postgres(ql)?$/ });
+
 const envSchema = z.object({
-  DATABASE_URL: z.url({ protocol: /^postgres(ql)?$/ }),
+  DATABASE_URL: databaseUrlSchema,
   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().startsWith('pk_'),
   CLERK_SECRET_KEY: z.string().startsWith('sk_'),
   LITELLM_BASE_URL: z.url({ protocol: /^https?$/ }),
@@ -59,6 +61,20 @@ let cachedEnv: Env | undefined;
 export function getEnv(): Env {
   cachedEnv ??= parseEnv(process.env);
   return cachedEnv;
+}
+
+// Separate from parseEnv so migrations don't need the app's other secrets.
+export function resolveDatabaseUrl(source: EnvSource): string {
+  const result = databaseUrlSchema.safeParse(source.DATABASE_URL);
+  if (result.success) {
+    return result.data;
+  }
+
+  throw new EnvValidationError(['DATABASE_URL']);
+}
+
+export function getDatabaseUrl(): string {
+  return resolveDatabaseUrl(process.env);
 }
 
 // Separate from parseEnv so a bad config can still be logged.
