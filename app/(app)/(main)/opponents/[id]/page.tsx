@@ -3,17 +3,19 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { ReactElement } from 'react';
 
+import { ScoutingSection } from '@/components/ai/ScoutingSection';
 import { gripLabels, handednessLabels, playStyleLabels, rubberTypeLabels } from '@/components/forms/option-labels';
 import { formatPercentage, formatRecord, StatCard } from '@/components/stats/StatCard';
 import { WeaknessList } from '@/components/stats/WeaknessList';
 import { Button } from '@/components/ui/button';
 import { requireOnboardedUser } from '@/lib/auth';
 import { editOpponentRoute, matchRoute, newMatchAgainstRoute } from '@/lib/config/routes';
+import { listScoutingReports } from '@/lib/db/queries/ai';
 import { listCompletedMatchesForAnalysis } from '@/lib/db/queries/matches';
 import { getOpponent } from '@/lib/db/queries/opponents';
 import { Side } from '@/lib/domain/enums';
 import { opponentIdSchema } from '@/lib/domain/ids';
-import { computeHeadToHead, detectWeaknesses } from '@/lib/domain/stats';
+import { computeHeadToHead, detectWeaknesses, hasEnoughDataForScouting } from '@/lib/domain/stats';
 
 const NOT_SET = 'Not sure';
 
@@ -33,7 +35,11 @@ export default async function OpponentPage({ params }: OpponentPageProps): Promi
     notFound();
   }
 
-  const completedMatches = await listCompletedMatchesForAnalysis(userId, opponent.id);
+  const [completedMatches, reports] = await Promise.all([
+    listCompletedMatchesForAnalysis(userId, opponent.id),
+    listScoutingReports(userId, opponent.id),
+  ]);
+  const totalPoints = completedMatches.reduce((total, { points }) => total + points.length, 0);
   const headToHead = computeHeadToHead(
     completedMatches.flatMap(({ match, points }) => (match.winner ? [{ ...match, winner: match.winner, points }] : [])),
   );
@@ -73,6 +79,12 @@ export default async function OpponentPage({ params }: OpponentPageProps): Promi
       <Button asChild size="large" className="w-full sm:w-auto sm:self-start">
         <Link href={newMatchAgainstRoute(opponent.id)}>Start a match</Link>
       </Button>
+
+      <ScoutingSection
+        opponentId={opponent.id}
+        reports={reports}
+        hasEnoughData={hasEnoughDataForScouting(completedMatches.length, totalPoints)}
+      />
 
       {completedMatches.length > 0 ? (
         <div className="flex flex-col gap-3">

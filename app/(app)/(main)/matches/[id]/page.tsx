@@ -2,16 +2,22 @@ import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import type { ReactElement } from 'react';
 
+import { MatchSummarySection } from '@/components/ai/MatchSummarySection';
 import { MomentumChart } from '@/components/stats/MomentumChart';
 import { formatPercentage, StatCard } from '@/components/stats/StatCard';
 import { Button } from '@/components/ui/button';
 import { requireOnboardedUser } from '@/lib/auth';
+import { AUTO_SUMMARY_WINDOW_MS } from '@/lib/config/app';
 import { liveMatchRoute, opponentRoute, Route } from '@/lib/config/routes';
 import { getMatchWithPoints } from '@/lib/db/queries/matches';
 import { MatchStatus, Side } from '@/lib/domain/enums';
 import { matchIdSchema } from '@/lib/domain/ids';
 import { deriveState } from '@/lib/domain/scoring';
 import { computeMatchStats } from '@/lib/domain/stats';
+
+function finishedRecently(completedAt: Date | null): boolean {
+  return completedAt !== null && Date.now() - completedAt.getTime() < AUTO_SUMMARY_WINDOW_MS;
+}
 
 interface MatchPageProps {
   params: Promise<{ id: string }>;
@@ -68,6 +74,10 @@ export default async function MatchPage({ params }: MatchPageProps): Promise<Rea
             </li>
           ))}
         </ol>
+      ) : null}
+
+      {match.status === MatchStatus.Completed ? (
+        <MatchSummarySection matchId={match.id} storedSummary={match.summary} shouldGenerateOnMount={finishedRecently(match.completedAt)} />
       ) : null}
 
       {points.length > 0 ? (
