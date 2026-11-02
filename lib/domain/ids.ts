@@ -11,3 +11,9 @@ export type MatchId = z.infer<typeof matchIdSchema>;
 
 export const pointIdSchema = z.uuid().brand<'PointId'>();
 export type PointId = z.infer<typeof pointIdSchema>;
+
+export const scoutingReportIdSchema = z.uuid().brand<'ScoutingReportId'>();
+export type ScoutingReportId = z.infer<typeof scoutingReportIdSchema>;
+
+export const aiCallIdSchema = z.uuid().brand<'AiCallId'>();
+export type AiCallId = z.infer<typeof aiCallIdSchema>;

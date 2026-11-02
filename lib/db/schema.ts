@@ -3,6 +3,7 @@ import { sql } from 'drizzle-orm';
 
 import { INITIAL_RATING } from '@/lib/domain/constants';
 import {
+  AiFeature,
   EventType,
   Grip,
   Handedness,
@@ -13,7 +14,7 @@ import {
   RubberType,
   Side,
 } from '@/lib/domain/enums';
-import type { MatchId, OpponentId, PointId, UserId } from '@/lib/domain/ids';
+import type { AiCallId, MatchId, OpponentId, PointId, ScoutingReportId, UserId } from '@/lib/domain/ids';
 import type { BestOf } from '@/lib/domain/scoring';
 
 export const handednessEnum = pgEnum('handedness', Handedness);
@@ -25,6 +26,7 @@ export const matchStatusEnum = pgEnum('match_status', MatchStatus);
 export const eventTypeEnum = pgEnum('event_type', EventType);
 export const pointEndingEnum = pgEnum('point_ending', PointEnding);
 export const rallyLengthBucketEnum = pgEnum('rally_length_bucket', RallyLengthBucket);
+export const aiFeatureEnum = pgEnum('ai_feature', AiFeature);
 
 export const users = pgTable('users', {
   id: text('id').primaryKey().$type<UserId>(),
@@ -111,4 +113,42 @@ export const points = pgTable(
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [uniqueIndex('points_match_id_seq_idx').on(table.matchId, table.seq)],
+);
+
+export const scoutingReports = pgTable(
+  'scouting_reports',
+  {
+    id: uuid('id').primaryKey().defaultRandom().$type<ScoutingReportId>(),
+    ownerId: text('owner_id')
+      .notNull()
+      .references(() => users.id)
+      .$type<UserId>(),
+    opponentId: uuid('opponent_id')
+      .notNull()
+      .references(() => opponents.id)
+      .$type<OpponentId>(),
+    statsSnapshot: jsonb('stats_snapshot').notNull(),
+    report: jsonb('report').notNull(),
+    model: text('model').notNull(),
+    matchCount: integer('match_count').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index('scouting_reports_owner_opponent_created_idx').on(table.ownerId, table.opponentId, table.createdAt)],
+);
+
+export const aiCalls = pgTable(
+  'ai_calls',
+  {
+    id: uuid('id').primaryKey().defaultRandom().$type<AiCallId>(),
+    ownerId: text('owner_id')
+      .notNull()
+      .references(() => users.id)
+      .$type<UserId>(),
+    feature: aiFeatureEnum('feature').notNull(),
+    model: text('model').notNull(),
+    totalTokens: integer('total_tokens'),
+    latencyMs: integer('latency_ms').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index('ai_calls_owner_created_idx').on(table.ownerId, table.createdAt)],
 );

@@ -15,6 +15,13 @@
       "when": 1793654751713,
       "tag": "0001_matches_and_points",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793656748649,
+      "tag": "0002_ai_reports",
+      "breakpoints": true
     }
   ]
 }

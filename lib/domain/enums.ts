@@ -57,3 +57,9 @@ export type PointEnding = (typeof PointEnding)[keyof typeof PointEnding];
 
 export const RallyLengthBucket = { Short: 'short', Medium: 'medium', Long: 'long' } as const;
 export type RallyLengthBucket = (typeof RallyLengthBucket)[keyof typeof RallyLengthBucket];
+
+export const ReportConfidence = { Low: 'low', Medium: 'medium', High: 'high' } as const;
+export type ReportConfidence = (typeof ReportConfidence)[keyof typeof ReportConfidence];
+
+export const AiFeature = { ScoutingReport: 'scouting_report', MatchSummary: 'match_summary' } as const;
+export type AiFeature = (typeof AiFeature)[keyof typeof AiFeature];
