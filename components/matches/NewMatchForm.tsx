@@ -1,5 +1,6 @@
 'use client';
 
+import { Coins } from 'lucide-react';
 import { useActionState, useState, type ReactElement } from 'react';
 
 import { ChoiceGroup } from '@/components/forms/ChoiceGroup';
@@ -34,7 +35,7 @@ export function NewMatchForm({ opponents, preselectedOpponentId }: NewMatchFormP
   }
 
   return (
-    <form action={formAction} noValidate className="flex flex-col gap-8">
+    <form action={formAction} noValidate className="grid items-start gap-8 lg:grid-cols-2 lg:gap-16">
       <ChoiceGroup
         legend="Opponent"
         name="opponentId"
@@ -42,6 +43,8 @@ export function NewMatchForm({ opponents, preselectedOpponentId }: NewMatchFormP
         selected={values.opponentId ?? preselectedOpponentId}
         errors={fieldErrors.opponentId}
       />
+
+      <div className="flex flex-col gap-8">
       <ChoiceGroup
         legend="Match length"
         name="bestOf"
@@ -61,9 +64,15 @@ export function NewMatchForm({ opponents, preselectedOpponentId }: NewMatchFormP
           errors={fieldErrors.firstServer}
           className="grid-cols-2"
         />
-        <Button type="button" variant="ghost" onClick={tossCoin} className="-ml-4 self-start">
+        <Button type="button" variant="outline" onClick={tossCoin} className="w-full sm:w-auto sm:self-start">
+          <Coins aria-hidden="true" className="size-4" />
           Toss a coin
         </Button>
+        {tossCount > 0 && selectedServer ? (
+          <p role="status" className="text-sm font-medium text-foreground-soft">
+            {selectedServer === Side.Me ? 'You won the toss and serve first.' : 'Your opponent serves first.'}
+          </p>
+        ) : null}
       </div>
 
       <ChoiceGroup
@@ -84,6 +93,7 @@ export function NewMatchForm({ opponents, preselectedOpponentId }: NewMatchFormP
         <Button type="submit" size="large" disabled={isPending} className="w-full sm:w-auto sm:self-start">
           {isPending ? 'Starting…' : 'Start match'}
         </Button>
+      </div>
       </div>
     </form>
   );

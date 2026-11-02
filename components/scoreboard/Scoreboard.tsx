@@ -8,7 +8,7 @@ import { pointEndingLabels } from '@/components/forms/option-labels';
 import { Button } from '@/components/ui/button';
 import { abandonMatchAction, recordPointAction, revalidateAfterMatchEnd, tagPointAction, undoPointAction } from '@/lib/actions/matches';
 import { POINT_TAP_DEBOUNCE_MS, TAG_SHEET_DISMISS_MS } from '@/lib/config/app';
-import { matchRoute } from '@/lib/config/routes';
+import { matchRoute, Route } from '@/lib/config/routes';
 import { Side } from '@/lib/domain/enums';
 import type { MatchId } from '@/lib/domain/ids';
 import { pointTagOptions, type PointTag } from '@/lib/domain/point-tags';
@@ -151,7 +151,7 @@ export function Scoreboard({ matchId, opponentName, settings, initialPoints }: S
       <header className="flex items-center justify-between gap-2 px-2 py-1">
         <Button
           variant="ghost"
-          aria-label="End match"
+          aria-label="Leave match"
           onClick={() => {
             setIsConfirmingEnd(true);
           }}
@@ -259,22 +259,26 @@ export function Scoreboard({ matchId, opponentName, settings, initialPoints }: S
       ) : null}
 
       {isConfirmingEnd ? (
-        <BottomSheet label="End this match?">
-          <h2 className="font-display text-4xl font-black uppercase leading-none">End this match?</h2>
-          <p className="text-foreground-soft">It will be marked abandoned and won&apos;t count toward your rating.</p>
-          <form action={abandonMatchAction.bind(null, matchId)} className="contents">
-            <Button type="submit" size="large" className="w-full">
-              End match
-            </Button>
-          </form>
+        <BottomSheet label="Leave this match?">
+          <h2 className="font-display text-4xl font-black uppercase leading-none">Leave this match?</h2>
+          <p className="text-foreground-soft">Your score is saved, so you can resume it from the dashboard.</p>
           <Button
-            variant="ghost"
+            size="large"
+            className="w-full"
             onClick={() => {
               setIsConfirmingEnd(false);
             }}
           >
             Keep playing
           </Button>
+          <Button asChild variant="outline" className="w-full">
+            <Link href={Route.Dashboard}>Leave for now</Link>
+          </Button>
+          <form action={abandonMatchAction.bind(null, matchId)} className="contents">
+            <Button type="submit" variant="ghost" className="w-full">
+              End without finishing
+            </Button>
+          </form>
         </BottomSheet>
       ) : null}
     </div>
@@ -307,22 +311,22 @@ function ScoreZone({ name, side, state, gamesWon, onAward }: ScoreZoneProps): Re
         isServing && 'border-2 border-primary',
       )}
     >
-      <span className="flex items-center gap-2 px-3 text-center text-lg font-semibold">
+      <span className="flex items-center gap-2 px-3 text-center text-lg font-semibold lg:text-3xl">
         <span className="truncate">{name}</span>
         {isServing ? (
-          <span className="flex items-center gap-1 text-sm font-medium text-primary">
-            <span aria-hidden="true" className="size-3 rounded-full bg-primary" />
+          <span className="flex items-center gap-1 text-sm font-medium text-primary lg:text-xl">
+            <span aria-hidden="true" className="size-3 rounded-full bg-primary lg:size-4" />
             {state.servesLeft === 2 ? '2 serves' : '1 serve'}
           </span>
         ) : null}
       </span>
       <span
         key={score}
-        className="animate-score-pop font-display text-[clamp(6rem,24dvh,16rem)] font-extrabold leading-none tabular-nums"
+        className="animate-score-pop font-display text-[clamp(6rem,24dvh,16rem)] font-extrabold leading-none tabular-nums landscape:text-[clamp(7rem,48dvh,30rem)]"
       >
         {score}
       </span>
-      <span className="flex min-h-7 items-center gap-2 text-sm font-medium text-muted-foreground">
+      <span className="flex min-h-7 items-center gap-2 text-sm font-medium text-muted-foreground lg:text-xl">
         Games {gamesWon}
         {badge ? (
           <span className="rounded-full bg-primary px-3 py-0.5 font-semibold text-primary-foreground">{badge}</span>

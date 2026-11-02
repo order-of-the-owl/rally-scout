@@ -1,7 +1,9 @@
+import { Show } from '@clerk/nextjs';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import type { ReactElement } from 'react';
 
+import { Logo } from '@/components/app/Logo';
 import { RallyLine } from '@/components/marketing/RallyLine';
 import { ScoreboardPreview } from '@/components/marketing/ScoreboardPreview';
 import { Button } from '@/components/ui/button';
@@ -23,16 +25,17 @@ export default function LandingPage(): ReactElement {
     <div className="overflow-hidden">
       <div className="mx-auto max-w-310 px-4 sm:px-6 lg:px-10">
         <header className="flex items-center justify-between gap-4 py-6">
-          <Link
-            href={Route.Home}
-            className="flex min-h-11 items-center gap-2.5 font-display text-[1.625rem] font-extrabold tracking-wide"
-          >
-            <span aria-hidden="true" className="size-3.5 rounded-full bg-primary" />
-            RALLY SCOUT
-          </Link>
-          <Button asChild variant="ghost" className="-mr-4">
-            <Link href={Route.SignIn}>Sign in</Link>
-          </Button>
+          <Logo href={Route.Home} />
+          <Show when="signed-out">
+            <Button asChild variant="ghost" className="-mr-4">
+              <Link href={Route.SignIn}>Sign in</Link>
+            </Button>
+          </Show>
+          <Show when="signed-in">
+            <Button asChild variant="ghost" className="-mr-4">
+              <Link href={Route.Dashboard}>Go to dashboard</Link>
+            </Button>
+          </Show>
         </header>
 
         <main>

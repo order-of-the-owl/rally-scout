@@ -1,9 +1,11 @@
 import { notFound } from 'next/navigation';
 import type { ReactElement } from 'react';
 
+import { BackLink } from '@/components/app/BackLink';
 import { OpponentForm } from '@/components/opponents/OpponentForm';
 import { updateOpponentAction } from '@/lib/actions/opponents';
 import { requireOnboardedUser } from '@/lib/auth';
+import { opponentRoute } from '@/lib/config/routes';
 import { getOpponent } from '@/lib/db/queries/opponents';
 import { opponentIdSchema } from '@/lib/domain/ids';
 
@@ -24,7 +26,8 @@ export default async function EditOpponentPage({ params }: EditOpponentPageProps
   }
 
   return (
-    <section className="mx-auto flex max-w-2xl flex-col gap-8 py-6">
+    <section className="flex w-full max-w-2xl flex-col gap-8 py-6">
+      <BackLink href={opponentRoute(opponent.id)} label={opponent.name} />
       <h1 className="font-display text-5xl font-black uppercase leading-none">Edit opponent</h1>
       <OpponentForm
         action={updateOpponentAction.bind(null, opponent.id)}

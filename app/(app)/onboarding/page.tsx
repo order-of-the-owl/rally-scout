@@ -13,7 +13,7 @@ export default async function OnboardingPage(): Promise<ReactElement> {
   }
 
   return (
-    <section className="mx-auto flex max-w-2xl animate-rise flex-col gap-8 pb-16 pt-4">
+    <section className="mx-auto flex w-full max-w-2xl animate-rise flex-col gap-8 pb-16 pt-4">
       <div className="flex flex-col gap-3">
         <h1 className="font-display text-5xl font-black uppercase leading-none">Set up your profile</h1>
         <p className="text-pretty text-foreground-soft">

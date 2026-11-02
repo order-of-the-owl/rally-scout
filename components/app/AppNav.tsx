@@ -9,10 +9,10 @@ import { Route } from '@/lib/config/routes';
 import { cn } from '@/lib/utils';
 
 const navItems = [
-  { href: Route.Dashboard, label: 'Dashboard', Icon: LayoutDashboard },
-  { href: Route.Opponents, label: 'Opponents', Icon: Users },
-  { href: Route.NewMatch, label: 'Play', Icon: CirclePlay },
-  { href: Route.Profile, label: 'Profile', Icon: UserRound },
+  { href: Route.Dashboard, activePrefix: Route.Dashboard, label: 'Dashboard', Icon: LayoutDashboard },
+  { href: Route.Opponents, activePrefix: Route.Opponents, label: 'Opponents', Icon: Users },
+  { href: Route.NewMatch, activePrefix: Route.Matches, label: 'Play', Icon: CirclePlay },
+  { href: Route.Profile, activePrefix: Route.Profile, label: 'Profile', Icon: UserRound },
 ] as const;
 
 export function AppNav(): ReactElement {
@@ -24,8 +24,8 @@ export function AppNav(): ReactElement {
       className="fixed inset-x-0 bottom-0 z-10 border-t border-border bg-card pb-[env(safe-area-inset-bottom)] md:static md:border-b md:border-t-0 md:bg-transparent md:pb-0"
     >
       <ul className="flex md:gap-6">
-        {navItems.map(({ href, label, Icon }) => {
-          const isActive = pathname === href || pathname.startsWith(`${href}/`);
+        {navItems.map(({ href, activePrefix, label, Icon }) => {
+          const isActive = pathname === activePrefix || pathname.startsWith(`${activePrefix}/`);
 
           return (
             <li key={href} className="flex-1 md:flex-none">

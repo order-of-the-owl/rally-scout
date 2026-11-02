@@ -76,6 +76,8 @@ export default async function MatchPage({ params }: MatchPageProps): Promise<Rea
         </ol>
       ) : null}
 
+      {points.length === 0 ? <p className="text-foreground-soft">No points were played in this match.</p> : null}
+
       {match.status === MatchStatus.Completed ? (
         <MatchSummarySection matchId={match.id} storedSummary={match.summary} shouldGenerateOnMount={finishedRecently(match.completedAt)} />
       ) : null}

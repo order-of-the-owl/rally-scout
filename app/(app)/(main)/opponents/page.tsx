@@ -53,7 +53,7 @@ export default async function OpponentsPage({ searchParams }: OpponentsPageProps
 
       {opponents.length > 0 ? (
         <ul className="flex flex-col border-t border-border">
-          {opponents.map(({ id, name, playStyle, rating }) => (
+          {opponents.map(({ id, name, playStyle }) => (
             <li key={id} className="border-b border-border">
               <Link
                 href={opponentRoute(id)}
@@ -63,13 +63,10 @@ export default async function OpponentsPage({ searchParams }: OpponentsPageProps
                   <span className="truncate text-lg font-semibold">{name}</span>
                   {playStyle ? <span className="text-sm text-muted-foreground">{playStyleLabels[playStyle]}</span> : null}
                 </span>
-                <span className="flex items-center gap-3">
-                  <span className="font-display text-2xl font-extrabold tabular-nums">{rating}</span>
-                  <ChevronRight
-                    aria-hidden="true"
-                    className="size-5 text-muted-foreground transition-transform group-hover:translate-x-0.5"
-                  />
-                </span>
+                <ChevronRight
+                  aria-hidden="true"
+                  className="size-5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5"
+                />
               </Link>
             </li>
           ))}

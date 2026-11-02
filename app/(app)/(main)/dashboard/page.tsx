@@ -50,12 +50,22 @@ export default async function DashboardPage(): Promise<ReactElement> {
           </Button>
         </div>
       ) : (
-        <Button asChild size="large" className="w-full sm:w-auto sm:self-start">
-          <Link href={Route.NewMatch}>
-            <CirclePlay aria-hidden="true" className="size-5" />
-            New match
-          </Link>
-        </Button>
+        <div className="flex flex-col items-start gap-4 rounded-xl border border-border bg-card p-6">
+          {recentMatches.length === 0 ? (
+            <div className="flex flex-col gap-1">
+              <h2 className="text-xl font-semibold">Play your first match</h2>
+              <p className="text-pretty text-foreground-soft">
+                Score it point by point, and your stats and weaknesses will show up here.
+              </p>
+            </div>
+          ) : null}
+          <Button asChild size="large" className="w-full sm:w-auto">
+            <Link href={Route.NewMatch}>
+              <CirclePlay aria-hidden="true" className="size-5" />
+              New match
+            </Link>
+          </Button>
+        </div>
       )}
 
       {topWeaknesses.length > 0 ? (

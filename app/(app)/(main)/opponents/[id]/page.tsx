@@ -4,12 +4,13 @@ import { notFound } from 'next/navigation';
 import type { ReactElement } from 'react';
 
 import { ScoutingSection } from '@/components/ai/ScoutingSection';
+import { BackLink } from '@/components/app/BackLink';
 import { gripLabels, handednessLabels, playStyleLabels, rubberTypeLabels } from '@/components/forms/option-labels';
 import { formatPercentage, formatRecord, StatCard } from '@/components/stats/StatCard';
 import { WeaknessList } from '@/components/stats/WeaknessList';
 import { Button } from '@/components/ui/button';
 import { requireOnboardedUser } from '@/lib/auth';
-import { editOpponentRoute, matchRoute, newMatchAgainstRoute } from '@/lib/config/routes';
+import { editOpponentRoute, matchRoute, newMatchAgainstRoute, Route } from '@/lib/config/routes';
 import { listScoutingReports } from '@/lib/db/queries/ai';
 import { listCompletedMatchesForAnalysis } from '@/lib/db/queries/matches';
 import { getOpponent } from '@/lib/db/queries/opponents';
@@ -61,12 +62,10 @@ export default async function OpponentPage({ params }: OpponentPageProps): Promi
 
   return (
     <section className="flex flex-col gap-8 py-6">
+      <BackLink href={Route.Opponents} label="All opponents" />
       <div className="flex items-start justify-between gap-4">
         <div className="flex min-w-0 flex-col gap-2">
           <h1 className="break-words font-display text-5xl font-black uppercase leading-none">{opponent.name}</h1>
-          <p className="text-foreground-soft">
-            Rating <span className="font-semibold tabular-nums text-foreground">{opponent.rating}</span>
-          </p>
         </div>
         <Button asChild variant="ghost" className="shrink-0">
           <Link href={editOpponentRoute(opponent.id)}>

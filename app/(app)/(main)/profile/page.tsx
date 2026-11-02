@@ -10,7 +10,7 @@ export default async function ProfilePage(): Promise<ReactElement> {
   const user = await requireOnboardedUser();
 
   return (
-    <section className="mx-auto flex max-w-2xl flex-col gap-8 py-6">
+    <section className="flex w-full max-w-2xl flex-col gap-8 py-6">
       <h1 className="font-display text-5xl font-black uppercase leading-none">Profile</h1>
       <ProfileForm
         action={updateProfileAction}

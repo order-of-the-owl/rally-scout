@@ -27,7 +27,7 @@ export default async function NewMatchPage({ searchParams }: NewMatchPageProps):
   const opponents = await listOpponents(userId);
 
   return (
-    <section className="mx-auto flex max-w-2xl flex-col gap-8 py-6">
+    <section className="flex w-full flex-col gap-8 py-6">
       <h1 className="font-display text-5xl font-black uppercase leading-none">New match</h1>
       {opponents.length === 0 ? (
         <div className="flex flex-col items-start gap-4 rounded-xl border border-border bg-card p-6">
