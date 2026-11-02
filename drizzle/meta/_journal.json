@@ -8,6 +8,13 @@
       "when": 1793651701003,
       "tag": "0000_users_and_opponents",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1793654751713,
+      "tag": "0001_matches_and_points",
+      "breakpoints": true
     }
   ]
 }

@@ -1,5 +1,7 @@
 export const INITIAL_RATING = 1200;
 
+export const BEST_OF_OPTIONS = [3, 5, 7] as const;
+
 export const POINTS_TO_WIN_GAME = 11;
 export const WINNING_MARGIN = 2;
 export const DEUCE_SCORE = POINTS_TO_WIN_GAME - 1;

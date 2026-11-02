@@ -1,4 +1,5 @@
 import {
+  type BEST_OF_OPTIONS,
   DECIDING_GAME_END_SWITCH_SCORE,
   DEUCE_SCORE,
   POINTS_TO_WIN_GAME,
@@ -7,8 +8,10 @@ import {
 } from '@/lib/domain/constants';
 import { Side } from '@/lib/domain/enums';
 
+export type BestOf = (typeof BEST_OF_OPTIONS)[number];
+
 export interface MatchSettings {
-  bestOf: 3 | 5 | 7;
+  bestOf: BestOf;
   firstServer: Side;
 }
 
@@ -62,7 +65,7 @@ function otherSide(side: Side): Side {
   return side === Side.Me ? Side.Opponent : Side.Me;
 }
 
-function gamesNeededToWin(bestOf: MatchSettings['bestOf']): number {
+function gamesNeededToWin(bestOf: BestOf): number {
   return Math.ceil(bestOf / 2);
 }
 
