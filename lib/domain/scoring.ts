@@ -73,7 +73,7 @@ function wouldWinGame(leaderScore: number, trailerScore: number): boolean {
   return leaderScore >= POINTS_TO_WIN_GAME && leaderScore - trailerScore >= WINNING_MARGIN;
 }
 
-function gameWinner({ me, opponent }: Score): Side | null {
+export function gameWinner({ me, opponent }: Score): Side | null {
   if (wouldWinGame(me, opponent)) {
     return Side.Me;
   }

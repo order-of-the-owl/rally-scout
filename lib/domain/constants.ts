@@ -7,3 +7,16 @@ export const WINNING_MARGIN = 2;
 export const DEUCE_SCORE = POINTS_TO_WIN_GAME - 1;
 export const SERVES_PER_TURN = 2;
 export const DECIDING_GAME_END_SWITCH_SCORE = 5;
+
+export const RECENT_MATCHES_FOR_TREND = 5;
+
+export const WeaknessThreshold = {
+  MinSamplePoints: 30,
+  ReceiveErrorShareOfLostPoints: 0.25,
+  ServeHoldRate: 0.5,
+  WingErrorRatio: 2,
+  MinWingErrors: 5,
+  DeuceWinRate: 0.4,
+  MinDeuceGames: 3,
+  OpponentTypeGapPercentagePoints: 10,
+} as const;
