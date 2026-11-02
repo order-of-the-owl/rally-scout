@@ -1,5 +1,11 @@
-import { DEUCE_SCORE, RECENT_MATCHES_FOR_TREND, WINNING_MARGIN, WeaknessThreshold } from '@/lib/domain/constants';
-import { PlayStyle, PointEnding, RubberType, Side } from '@/lib/domain/enums';
+import {
+  DEUCE_SCORE,
+  RECENT_MATCHES_FOR_TREND,
+  ScoutingThreshold,
+  WINNING_MARGIN,
+  WeaknessThreshold,
+} from '@/lib/domain/constants';
+import { PlayStyle, PointEnding, ReportConfidence, RubberType, Side } from '@/lib/domain/enums';
 import { gameWinner, type BestOf, type Score } from '@/lib/domain/scoring';
 
 export interface StatPoint {
@@ -299,6 +305,51 @@ export function computeHeadToHead(matches: readonly AnalyzedMatch[]): HeadToHead
       allTime: pointsWonRatio(allPoints),
     },
   };
+}
+
+export interface MomentumSwing {
+  beneficiary: Side;
+  fromPoint: number;
+  toPoint: number;
+  swing: number;
+  gameNumber: number;
+}
+
+export function findBiggestSwing(momentum: readonly MomentumPoint[]): MomentumSwing | null {
+  let biggest: MomentumSwing | null = null;
+  let low = { point: 0, difference: 0 };
+  let high = { point: 0, difference: 0 };
+
+  for (const { point, difference, gameNumber } of momentum) {
+    const rise = difference - low.difference;
+    const fall = high.difference - difference;
+    if (rise > (biggest?.swing ?? 0)) {
+      biggest = { beneficiary: Side.Me, fromPoint: low.point, toPoint: point, swing: rise, gameNumber };
+    }
+    if (fall > (biggest?.swing ?? 0)) {
+      biggest = { beneficiary: Side.Opponent, fromPoint: high.point, toPoint: point, swing: fall, gameNumber };
+    }
+    if (difference < low.difference) {
+      low = { point, difference };
+    }
+    if (difference > high.difference) {
+      high = { point, difference };
+    }
+  }
+  return biggest;
+}
+
+export function hasEnoughDataForScouting(completedMatches: number, totalPoints: number): boolean {
+  return completedMatches >= ScoutingThreshold.MinCompletedMatches && totalPoints >= ScoutingThreshold.MinPoints;
+}
+
+export function scoutingConfidence(completedMatches: number): ReportConfidence {
+  if (completedMatches < ScoutingThreshold.MediumConfidenceMatches) {
+    return ReportConfidence.Low;
+  }
+  return completedMatches > ScoutingThreshold.HighConfidenceAboveMatches
+    ? ReportConfidence.High
+    : ReportConfidence.Medium;
 }
 
 export const WeaknessKey = {

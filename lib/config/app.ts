@@ -6,3 +6,9 @@ export const POINT_TAP_DEBOUNCE_MS = 300;
 export const TAG_SHEET_DISMISS_MS = 4000;
 export const DASHBOARD_RECENT_MATCHES_LIMIT = 5;
 export const DASHBOARD_WEAKNESSES_LIMIT = 3;
+
+export const AI_REQUEST_TIMEOUT_MS = 60_000;
+export const AI_MAX_ATTEMPTS = 2;
+export const AI_PROVIDER_RETRIES = 2;
+export const AI_RATE_LIMIT_WINDOW_MS = 3_600_000;
+export const AUTO_SUMMARY_WINDOW_MS = 600_000;

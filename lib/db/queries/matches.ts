@@ -152,7 +152,7 @@ export async function undoLastPoint(ownerId: UserId, matchId: MatchId, expectedS
     if (match.status === MatchStatus.Completed) {
       await tx
         .update(matches)
-        .set({ status: MatchStatus.InProgress, winner: null, completedAt: null })
+        .set({ status: MatchStatus.InProgress, winner: null, completedAt: null, summary: null })
         .where(eq(matches.id, matchId));
     }
     return { status: 'changed', points: existing.slice(0, -1) };
@@ -238,4 +238,13 @@ export async function listCompletedMatchesForAnalysis(
     pointsByMatch.set(point.matchId, [...(pointsByMatch.get(point.matchId) ?? []), point]);
   }
   return rows.map((row) => ({ ...row, points: pointsByMatch.get(row.match.id) ?? [] }));
+}
+
+export async function saveMatchSummary(ownerId: UserId, matchId: MatchId, summary: unknown): Promise<boolean> {
+  const updated = await getDb()
+    .update(matches)
+    .set({ summary })
+    .where(and(eq(matches.id, matchId), eq(matches.ownerId, ownerId)))
+    .returning({ id: matches.id });
+  return updated.length > 0;
 }

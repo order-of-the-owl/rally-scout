@@ -10,6 +10,13 @@ export const DECIDING_GAME_END_SWITCH_SCORE = 5;
 
 export const RECENT_MATCHES_FOR_TREND = 5;
 
+export const ScoutingThreshold = {
+  MinCompletedMatches: 1,
+  MinPoints: 30,
+  MediumConfidenceMatches: 3,
+  HighConfidenceAboveMatches: 5,
+} as const;
+
 export const WeaknessThreshold = {
   MinSamplePoints: 30,
   ReceiveErrorShareOfLostPoints: 0.25,

@@ -1,12 +1,15 @@
 import { describe, expect, it } from 'vitest';
 
-import { PlayStyle, PointEnding, RubberType, Side } from '@/lib/domain/enums';
+import { PlayStyle, PointEnding, ReportConfidence, RubberType, Side } from '@/lib/domain/enums';
 import {
   aggregateStats,
   computeHeadToHead,
   computeMatchStats,
   detectWeaknesses,
+  findBiggestSwing,
+  hasEnoughDataForScouting,
   ratio,
+  scoutingConfidence,
   WeaknessKey,
   type AnalyzedMatch,
   type MatchForWeaknesses,
@@ -294,5 +297,51 @@ describe('detectWeaknesses', () => {
 
   it('returns nothing without data', () => {
     expect(detectWeaknesses([])).toEqual([]);
+  });
+});
+
+describe('findBiggestSwing', () => {
+  function momentumOf(...runs: readonly (readonly [Side, number])[]) {
+    return computeMatchStats(game(1, ...runs)).momentum;
+  }
+
+  it('finds a comeback in my favour', () => {
+    expect(findBiggestSwing(momentumOf([Opponent, 6], [Me, 9]))).toMatchObject({
+      beneficiary: Me,
+      fromPoint: 6,
+      toPoint: 15,
+      swing: 9,
+    });
+  });
+
+  it('finds a collapse in their favour', () => {
+    expect(findBiggestSwing(momentumOf([Me, 4], [Opponent, 7]))).toMatchObject({
+      beneficiary: Opponent,
+      fromPoint: 4,
+      toPoint: 11,
+      swing: 7,
+    });
+  });
+
+  it('has none for an empty match', () => {
+    expect(findBiggestSwing([])).toBeNull();
+  });
+});
+
+describe('scouting thresholds', () => {
+  it('needs one completed match and 30 points', () => {
+    expect(hasEnoughDataForScouting(0, 40)).toBe(false);
+    expect(hasEnoughDataForScouting(1, 29)).toBe(false);
+    expect(hasEnoughDataForScouting(1, 30)).toBe(true);
+  });
+
+  it.each([
+    [1, ReportConfidence.Low],
+    [2, ReportConfidence.Low],
+    [3, ReportConfidence.Medium],
+    [5, ReportConfidence.Medium],
+    [6, ReportConfidence.High],
+  ])('%i matches gives %s confidence', (matches, confidence) => {
+    expect(scoutingConfidence(matches)).toBe(confidence);
   });
 });

@@ -18,6 +18,7 @@ const eslintConfig = tseslint.config(
     rules: {
       '@typescript-eslint/switch-exhaustiveness-check': 'error',
       '@typescript-eslint/consistent-type-imports': 'error',
+      '@typescript-eslint/no-unused-vars': ['error', { ignoreRestSiblings: true, argsIgnorePattern: '^_' }],
       'no-console': 'error',
       'no-restricted-syntax': [
         'error',
