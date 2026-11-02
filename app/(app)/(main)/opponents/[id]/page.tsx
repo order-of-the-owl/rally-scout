@@ -4,11 +4,16 @@ import { notFound } from 'next/navigation';
 import type { ReactElement } from 'react';
 
 import { gripLabels, handednessLabels, playStyleLabels, rubberTypeLabels } from '@/components/forms/option-labels';
+import { formatPercentage, formatRecord, StatCard } from '@/components/stats/StatCard';
+import { WeaknessList } from '@/components/stats/WeaknessList';
 import { Button } from '@/components/ui/button';
 import { requireOnboardedUser } from '@/lib/auth';
-import { editOpponentRoute, newMatchAgainstRoute } from '@/lib/config/routes';
+import { editOpponentRoute, matchRoute, newMatchAgainstRoute } from '@/lib/config/routes';
+import { listCompletedMatchesForAnalysis } from '@/lib/db/queries/matches';
 import { getOpponent } from '@/lib/db/queries/opponents';
+import { Side } from '@/lib/domain/enums';
 import { opponentIdSchema } from '@/lib/domain/ids';
+import { computeHeadToHead, detectWeaknesses } from '@/lib/domain/stats';
 
 const NOT_SET = 'Not sure';
 
@@ -27,6 +32,12 @@ export default async function OpponentPage({ params }: OpponentPageProps): Promi
   if (!opponent) {
     notFound();
   }
+
+  const completedMatches = await listCompletedMatchesForAnalysis(userId, opponent.id);
+  const headToHead = computeHeadToHead(
+    completedMatches.flatMap(({ match, points }) => (match.winner ? [{ ...match, winner: match.winner, points }] : [])),
+  );
+  const weaknesses = detectWeaknesses(completedMatches);
 
   const details = [
     { label: 'Playing hand', value: opponent.handedness ? handednessLabels[opponent.handedness] : NOT_SET },
@@ -63,6 +74,35 @@ export default async function OpponentPage({ params }: OpponentPageProps): Promi
         <Link href={newMatchAgainstRoute(opponent.id)}>Start a match</Link>
       </Button>
 
+      {completedMatches.length > 0 ? (
+        <div className="flex flex-col gap-3">
+          <h2 className="text-xl font-semibold">Head to head</h2>
+          <div className="grid grid-cols-2 gap-2.5 md:grid-cols-4">
+            <StatCard label="Matches" value={formatRecord(headToHead.matches)} />
+            <StatCard label="Games" value={formatRecord(headToHead.games)} />
+            <StatCard label="Deuce games" value={formatRecord(headToHead.stats.deuceGames)} />
+            <StatCard label="Deciding games" value={formatRecord(headToHead.decidingGames)} />
+            <StatCard
+              label="Points won"
+              value={formatPercentage(headToHead.pointsWonTrend.allTime)}
+              detail={`Last 5 matches: ${formatPercentage(headToHead.pointsWonTrend.recent)}`}
+            />
+            <StatCard label="On your serve" value={formatPercentage(headToHead.stats.pointsWon.onMyServe)} />
+            <StatCard label="On their serve" value={formatPercentage(headToHead.stats.pointsWon.onTheirServe)} />
+            <StatCard label="Receive errors" value={String(headToHead.stats.serveReceive.receiveErrors)} />
+          </div>
+        </div>
+      ) : (
+        <p className="text-pretty text-foreground-soft">Play a match against {opponent.name} to see your head-to-head.</p>
+      )}
+
+      {weaknesses.length > 0 ? (
+        <div className="flex flex-col gap-3">
+          <h2 className="text-xl font-semibold">What keeps costing you</h2>
+          <WeaknessList weaknesses={weaknesses} />
+        </div>
+      ) : null}
+
       <dl className="grid gap-x-8 border-t border-border sm:grid-cols-2">
         {details.map(({ label, value }) => (
           <div key={label} className="flex justify-between gap-4 border-b border-border py-3.5">
@@ -71,6 +111,29 @@ export default async function OpponentPage({ params }: OpponentPageProps): Promi
           </div>
         ))}
       </dl>
+
+      {completedMatches.length > 0 ? (
+        <div className="flex flex-col gap-3">
+          <h2 className="text-xl font-semibold">Match history</h2>
+          <ul className="flex flex-col border-t border-border">
+            {completedMatches.map(({ match }) => (
+              <li key={match.id} className="border-b border-border">
+                <Link
+                  href={matchRoute(match.id)}
+                  className="flex min-h-12 items-center justify-between gap-4 py-2 transition-colors hover:text-primary"
+                >
+                  <time dateTime={match.playedAt.toISOString()} className="text-foreground-soft">
+                    {match.playedAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  </time>
+                  <span className={`font-semibold ${match.winner === Side.Me ? 'text-primary' : 'text-muted-foreground'}`}>
+                    {match.winner === Side.Me ? 'Won' : 'Lost'}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
 
       {opponent.notes ? (
         <div className="flex flex-col gap-2">

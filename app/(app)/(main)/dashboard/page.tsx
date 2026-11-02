@@ -2,21 +2,25 @@ import { ChevronRight, CirclePlay } from 'lucide-react';
 import Link from 'next/link';
 import type { ReactElement } from 'react';
 
+import { WeaknessList } from '@/components/stats/WeaknessList';
 import { Button } from '@/components/ui/button';
 import { requireOnboardedUser } from '@/lib/auth';
-import { DASHBOARD_RECENT_MATCHES_LIMIT } from '@/lib/config/app';
+import { DASHBOARD_RECENT_MATCHES_LIMIT, DASHBOARD_WEAKNESSES_LIMIT } from '@/lib/config/app';
 import { liveMatchRoute, matchRoute, Route } from '@/lib/config/routes';
-import { getInProgressMatch, listRecentCompletedMatches } from '@/lib/db/queries/matches';
+import { getInProgressMatch, listCompletedMatchesForAnalysis, listRecentCompletedMatches } from '@/lib/db/queries/matches';
 import { listOpponents } from '@/lib/db/queries/opponents';
 import { Side } from '@/lib/domain/enums';
+import { detectWeaknesses } from '@/lib/domain/stats';
 
 export default async function DashboardPage(): Promise<ReactElement> {
   const { id: userId } = await requireOnboardedUser();
-  const [opponents, inProgress, recentMatches] = await Promise.all([
+  const [opponents, inProgress, recentMatches, completedMatches] = await Promise.all([
     listOpponents(userId),
     getInProgressMatch(userId),
     listRecentCompletedMatches(userId, DASHBOARD_RECENT_MATCHES_LIMIT),
+    listCompletedMatchesForAnalysis(userId),
   ]);
+  const topWeaknesses = detectWeaknesses(completedMatches).slice(0, DASHBOARD_WEAKNESSES_LIMIT);
 
   return (
     <section className="flex flex-col gap-6 py-6">
@@ -53,6 +57,13 @@ export default async function DashboardPage(): Promise<ReactElement> {
           </Link>
         </Button>
       )}
+
+      {topWeaknesses.length > 0 ? (
+        <div className="flex flex-col gap-2">
+          <h2 className="text-xl font-semibold">Your top weaknesses</h2>
+          <WeaknessList weaknesses={topWeaknesses} />
+        </div>
+      ) : null}
 
       {recentMatches.length > 0 ? (
         <div className="flex flex-col gap-2">

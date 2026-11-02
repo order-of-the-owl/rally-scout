@@ -1,10 +1,10 @@
-import { and, asc, desc, eq, getTableColumns } from 'drizzle-orm';
+import { and, asc, desc, eq, getTableColumns, inArray } from 'drizzle-orm';
 
 import { getDb } from '@/lib/db';
-import { getOpponent } from '@/lib/db/queries/opponents';
+import { getOpponent, type Opponent } from '@/lib/db/queries/opponents';
 import { matches, opponents, points } from '@/lib/db/schema';
 import { MatchStatus, type PointEnding, type Side } from '@/lib/domain/enums';
-import type { MatchId, UserId } from '@/lib/domain/ids';
+import type { MatchId, OpponentId, UserId } from '@/lib/domain/ids';
 import { canAddPoint, deriveState } from '@/lib/domain/scoring';
 import type { NewMatchInput } from '@/lib/validation/match';
 
@@ -186,4 +186,56 @@ export async function abandonMatch(ownerId: UserId, matchId: MatchId): Promise<b
     .where(and(eq(matches.id, matchId), eq(matches.ownerId, ownerId), eq(matches.status, MatchStatus.InProgress)))
     .returning({ id: matches.id });
   return updated.length > 0;
+}
+
+export interface CompletedMatch {
+  match: MatchWithOpponentName;
+  opponent: Pick<Opponent, 'playStyle' | 'forehandRubberType' | 'backhandRubberType'>;
+  points: Point[];
+}
+
+export async function listCompletedMatchesForAnalysis(
+  ownerId: UserId,
+  opponentId?: OpponentId,
+): Promise<CompletedMatch[]> {
+  const db = getDb();
+  const rows = await db
+    .select({
+      match: { ...getTableColumns(matches), opponentName: opponents.name },
+      opponent: {
+        playStyle: opponents.playStyle,
+        forehandRubberType: opponents.forehandRubberType,
+        backhandRubberType: opponents.backhandRubberType,
+      },
+    })
+    .from(matches)
+    .innerJoin(opponents, eq(matches.opponentId, opponents.id))
+    .where(
+      and(
+        eq(matches.ownerId, ownerId),
+        eq(matches.status, MatchStatus.Completed),
+        opponentId ? eq(matches.opponentId, opponentId) : undefined,
+      ),
+    )
+    .orderBy(desc(matches.playedAt));
+  if (rows.length === 0) {
+    return [];
+  }
+
+  const allPoints = await db
+    .select()
+    .from(points)
+    .where(
+      inArray(
+        points.matchId,
+        rows.map(({ match }) => match.id),
+      ),
+    )
+    .orderBy(asc(points.seq));
+
+  const pointsByMatch = new Map<MatchId, Point[]>();
+  for (const point of allPoints) {
+    pointsByMatch.set(point.matchId, [...(pointsByMatch.get(point.matchId) ?? []), point]);
+  }
+  return rows.map((row) => ({ ...row, points: pointsByMatch.get(row.match.id) ?? [] }));
 }
