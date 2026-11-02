@@ -1,6 +1,6 @@
 'use client';
 
-import { LayoutDashboard, UserRound } from 'lucide-react';
+import { LayoutDashboard, UserRound, Users } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { ReactElement } from 'react';
@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 
 const navItems = [
   { href: Route.Dashboard, label: 'Dashboard', Icon: LayoutDashboard },
+  { href: Route.Opponents, label: 'Opponents', Icon: Users },
   { href: Route.Profile, label: 'Profile', Icon: UserRound },
 ] as const;
 

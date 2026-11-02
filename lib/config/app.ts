@@ -1,2 +1,3 @@
 export const DISPLAY_NAME_MAX_LENGTH = 80;
 export const EQUIPMENT_NAME_MAX_LENGTH = 100;
+export const OPPONENT_NOTES_MAX_LENGTH = 2000;
