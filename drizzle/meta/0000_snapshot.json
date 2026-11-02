@@ -1,0 +1,258 @@
+{
+  "id": "cc42afc9-fe0e-47d8-8e67-227fb11209dc",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.opponents": {
+      "name": "opponents",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "owner_id": {
+          "name": "owner_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "handedness": {
+          "name": "handedness",
+          "type": "handedness",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "grip": {
+          "name": "grip",
+          "type": "grip",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "play_style": {
+          "name": "play_style",
+          "type": "play_style",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fh_rubber_type": {
+          "name": "fh_rubber_type",
+          "type": "rubber_type",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bh_rubber_type": {
+          "name": "bh_rubber_type",
+          "type": "rubber_type",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "traits": {
+          "name": "traits",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "rating": {
+          "name": "rating",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1200
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "opponents_owner_id_idx": {
+          "name": "opponents_owner_id_idx",
+          "columns": [
+            {
+              "expression": "owner_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "opponents_owner_id_users_id_fk": {
+          "name": "opponents_owner_id_users_id_fk",
+          "tableFrom": "opponents",
+          "tableTo": "users",
+          "columnsFrom": [
+            "owner_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.users": {
+      "name": "users",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "display_name": {
+          "name": "display_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "handedness": {
+          "name": "handedness",
+          "type": "handedness",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "grip": {
+          "name": "grip",
+          "type": "grip",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "play_style": {
+          "name": "play_style",
+          "type": "play_style",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "blade": {
+          "name": "blade",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fh_rubber": {
+          "name": "fh_rubber",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bh_rubber": {
+          "name": "bh_rubber",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "rating": {
+          "name": "rating",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1200
+        },
+        "onboarded_at": {
+          "name": "onboarded_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {
+    "public.grip": {
+      "name": "grip",
+      "schema": "public",
+      "values": [
+        "shakehand",
+        "penhold"
+      ]
+    },
+    "public.handedness": {
+      "name": "handedness",
+      "schema": "public",
+      "values": [
+        "right",
+        "left"
+      ]
+    },
+    "public.play_style": {
+      "name": "play_style",
+      "schema": "public",
+      "values": [
+        "offensive_looper",
+        "all_round",
+        "close_to_table_hitter",
+        "blocker",
+        "defender_chopper",
+        "penhold_attacker"
+      ]
+    },
+    "public.rubber_type": {
+      "name": "rubber_type",
+      "schema": "public",
+      "values": [
+        "inverted",
+        "short_pips",
+        "long_pips",
+        "anti"
+      ]
+    }
+  },
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
