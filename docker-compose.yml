@@ -16,15 +16,12 @@ services:
       retries: 30
 
   litellm:
-    image: ghcr.io/berriai/litellm:v1.106.6@sha256:37e2dafb088a7723beb998590682957386dfc83ffea1848486f8e0e5cfac0b06
-    command: ['--config', '/app/config.yaml', '--port', '4000']
+    build: ./litellm
     environment:
       LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:-sk-local-dev}
       PROVIDER_API_KEY: ${PROVIDER_API_KEY:-}
     ports:
       - '127.0.0.1:4000:4000'
-    volumes:
-      - ./litellm/config.yaml:/app/config.yaml:ro
     healthcheck:
       test:
         - CMD
