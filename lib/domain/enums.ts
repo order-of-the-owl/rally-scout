@@ -1,4 +1,7 @@
-export const Handedness = { Right: 'right', Left: 'left' } as const;
+export const Side = { Me: 'me', Opponent: 'opponent' } as const;
+export type Side = (typeof Side)[keyof typeof Side];
+
+export const Handedness ={ Right: 'right', Left: 'left' } as const;
 export type Handedness = (typeof Handedness)[keyof typeof Handedness];
 
 export const Grip = { Shakehand: 'shakehand', Penhold: 'penhold' } as const;
