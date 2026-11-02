@@ -1,0 +1,12 @@
+model_list:
+  - model_name: smart
+    litellm_params:
+      model: gemini/gemini-3.6-flash
+      api_key: os.environ/PROVIDER_API_KEY
+  - model_name: fast
+    litellm_params:
+      model: gemini/gemini-3.5-flash-lite
+      api_key: os.environ/PROVIDER_API_KEY
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY
